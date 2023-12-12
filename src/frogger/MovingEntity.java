@@ -47,9 +47,9 @@ public abstract class MovingEntity extends Body {
 	protected List<CollisionObject> collisionObjects;
 	
 	
-	public MovingEntity (String name) {
+	protected MovingEntity (String name) {
 		super(name);
-		collisionObjects = new LinkedList<CollisionObject>();
+		collisionObjects = new LinkedList<>();
 	}
 
 	public List<CollisionObject> getCollisionObjects() {

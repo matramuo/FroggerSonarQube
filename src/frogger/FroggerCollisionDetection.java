@@ -31,30 +31,30 @@ import jig.engine.util.Vector2D;
 
 public class FroggerCollisionDetection  {
 
-	public Frogger frog;
-	public CollisionObject frogSphere;
+	private Frogger frog;
+	private CollisionObject frogSphere;
 	
 	// River and Road bounds, all we care about is Y axis in this game
-    public int river_y0 = 1*32;
-    public int river_y1 = river_y0 + 6* 32;
-    public int road_y0 = 8*32;
-    public int road_y1 = road_y0 + 5*32;
+    private int riverY0 = 1*32;
+    private int riverY1 = getRiverY0() + 6* 32;
+    private int roadY0 = 8*32;
+    private int roadY1 = getRoadY0() + 5*32;
 	
 	public FroggerCollisionDetection (Frogger f) {
-		frog = f;
-		frogSphere = frog.getCollisionObjects().get(0);
+		setFrog(f);
+		setFrogSphere(getFrog().getCollisionObjects().get(0));
 	}
 	
 	public void testCollision(AbstractBodyLayer<MovingEntity> l) {
 
-		if (!frog.isAlive)
+		if (!getFrog().isAlive())
 			return;
 		
-		Vector2D frogPos = frogSphere.getCenterPosition();
+		Vector2D frogPos = getFrogSphere().getCenterPosition();
 		double dist2;
 		
 		if (isOutOfBounds()) {
-			frog.die();
+			getFrog().die();
 			return;
 		}
 		
@@ -65,8 +65,8 @@ public class FroggerCollisionDetection  {
 			List<CollisionObject> collisionObjects = i.getCollisionObjects();
 
 			for (CollisionObject objectSphere : collisionObjects) {
-				dist2 = (frogSphere.getRadius() + objectSphere.getRadius()) 
-				      * (frogSphere.getRadius() + objectSphere.getRadius());
+				dist2 = (getFrogSphere().getRadius() + objectSphere.getRadius()) 
+				      * (getFrogSphere().getRadius() + objectSphere.getRadius());
 
 				if (frogPos.distance2(objectSphere.getCenterPosition()) < dist2) {
 					collide(i, objectSphere);
@@ -76,11 +76,9 @@ public class FroggerCollisionDetection  {
 		}
 		
 		if (isInRiver()) {
-			frog.die();
-			return;
+			getFrog().die();
 		}
 		
-		//frog.allignXPositionToGrid();
 	}
 	
 	/**
@@ -88,12 +86,9 @@ public class FroggerCollisionDetection  {
 	 * @return
 	 */
 	public boolean isOutOfBounds() {
-		Vector2D frogPos = frogSphere.getCenterPosition();
-		if (frogPos.getY() < 32 || frogPos.getY() > Main.WORLD_HEIGHT)
-			return true;
-		if (frogPos.getX() < 0 || frogPos.getX() > Main.WORLD_WIDTH)
-			return true;
-		return false;
+	    Vector2D frogPos = getFrogSphere().getCenterPosition();
+	    return (frogPos.getY() < 32 || frogPos.getY() > Main.WORLD_HEIGHT) ||
+	           (frogPos.getX() < 0 || frogPos.getX() > Main.WORLD_WIDTH);
 	}
 	
 	/**
@@ -101,12 +96,9 @@ public class FroggerCollisionDetection  {
 	 * @return
 	 */
 	public boolean isInRiver() {
-		Vector2D frogPos = frogSphere.getCenterPosition();
-
-		if (frogPos.getY() > river_y0 && frogPos.getY() < river_y1)
-			return true;
-
-		return false;
+		Vector2D frogPos = getFrogSphere().getCenterPosition();
+		
+		return frogPos.getY() > getRiverY0() && frogPos.getY() < getRiverY1();
 	}
 	
 	/**
@@ -114,41 +106,87 @@ public class FroggerCollisionDetection  {
 	 * @return
 	 */
 	public boolean isOnRoad() {
-		Vector2D frogPos = frogSphere.getCenterPosition();
+		Vector2D frogPos = getFrogSphere().getCenterPosition();
+		
+		return frogPos.getY() > getRoadY0() && frogPos.getY() < getRoadY1();
 
-		if (frogPos.getY() > road_y0 && frogPos.getY() < road_y1)
-			return true;
-
-		return false;
 	}
 	
 	public void collide(MovingEntity m, CollisionObject s) {
 
 		if (m instanceof Truck  || m instanceof CopCar) {
-			frog.die();
+			getFrog().die();
 		}
 		
 		if (m instanceof Crocodile) {
 			if (s == ((Crocodile) m).head)
-				frog.die();
+				getFrog().die();
 			else
-				frog.follow(m);
+				getFrog().follow(m);
 		}
 		
 		/* Follow the log */
 		if (m instanceof LongLog || m instanceof ShortLog) {
-			frog.follow(m);
+			getFrog().follow(m);
 		}
 		
 		if (m instanceof Turtles) {
 			
-			frog.follow(m);
+			getFrog().follow(m);
 		}
 		
 		/* Reach a goal */
 		if (m instanceof Goal) {
-			frog.reach((Goal)(m));
+			getFrog().reach((Goal)(m));
 		}
+	}
+
+	public Frogger getFrog() {
+		return frog;
+	}
+
+	public void setFrog(Frogger frog) {
+		this.frog = frog;
+	}
+
+	public CollisionObject getFrogSphere() {
+		return frogSphere;
+	}
+
+	public void setFrogSphere(CollisionObject frogSphere) {
+		this.frogSphere = frogSphere;
+	}
+
+	public int getRiverY0() {
+		return riverY0;
+	}
+
+	public void setRiverY0(int riverY0) {
+		this.riverY0 = riverY0;
+	}
+
+	public int getRiverY1() {
+		return riverY1;
+	}
+
+	public void setRiverY1(int riverY1) {
+		this.riverY1 = riverY1;
+	}
+
+	public int getRoadY0() {
+		return roadY0;
+	}
+
+	public void setRoadY0(int roadY0) {
+		this.roadY0 = roadY0;
+	}
+
+	public int getRoadY1() {
+		return roadY1;
+	}
+
+	public void setRoadY1(int roadY1) {
+		this.roadY1 = roadY1;
 	}
 }
 	

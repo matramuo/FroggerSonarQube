@@ -60,10 +60,11 @@ public class Goal extends MovingEntity {
 			isBonus = false;
 			setFrame(0);
 		}
+		
 	}
 	
 	@Override
 	public void update(long deltaMs) {
-		return;
+		// Método heredado vacío.
 	}
 }

@@ -40,7 +40,7 @@ import jig.engine.util.Vector2D;
  */
 public class Turtles extends MovingEntity{
 	
-	public static final String colSmall = "colSmall";
+	public static final String COLSMALL = "colSmall";
 	
 	private long underwaterTime   = 0;
 	private long underwaterPeriod = 1200;
@@ -105,9 +105,9 @@ public class Turtles extends MovingEntity{
 		Vector2D posSphere1 = position;
 		Vector2D posSphere2 = new Vector2D(position.getX()+32, position.getY());
 		Vector2D posSphere3 = new Vector2D(position.getX()+64, position.getY());
-		collisionObjects.add(new CollisionObject(colSmall, posSphere1));
-		collisionObjects.add(new CollisionObject(colSmall, posSphere2));
-		collisionObjects.add(new CollisionObject(colSmall, posSphere3));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere1));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere2));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere3));
 		velocity = v;
 		
 		// Turtles floating direction, left/right		

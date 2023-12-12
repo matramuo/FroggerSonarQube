@@ -24,11 +24,15 @@
  */
 
 package frogger;
+import java.util.logging.Logger;
+
 import jig.engine.physics.vpe.VanillaSphere;
 import jig.engine.util.Vector2D;
 
 
 public class CollisionObject extends VanillaSphere {
+	
+	Logger logger = Logger.getLogger(getClass().getName());
 
 	public CollisionObject(Vector2D pos) {
 		super("col");
@@ -54,8 +58,7 @@ public class CollisionObject extends VanillaSphere {
 		try {
 	        throw new UnsupportedOperationException("Invalid operation for sorted list.");
 	    } catch (java.lang.UnsupportedOperationException e) {
-	        System.out.println("–");
+	        logger.info("–");
 	    }
-		return;
 	}
 }

@@ -36,8 +36,8 @@ import jig.engine.util.Vector2D;
  */
 public class WindGust {
 
-	final static int PERIOD    = 5000; //milliseconds
-	final static int DURATION  = 3000; //milliseconds
+	static final int PERIOD    = 5000; //milliseconds
+	static final int DURATION  = 3000; //milliseconds
 	
 	Random r;
 	
@@ -58,7 +58,7 @@ public class WindGust {
 	 * @param level 
 	 */
 	public void perform(Frogger f, int level, final long deltaMs) {
-		if (!f.isAlive) {
+		if (!f.isAlive()) {
 			isWindy = false;
 			return;
 		}

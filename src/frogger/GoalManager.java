@@ -34,7 +34,7 @@ import jig.engine.util.Vector2D;
 
 public class GoalManager {
 	
-	final static int MAX_NUM_OF_GOALS = 6;
+	static final int MAX_NUM_OF_GOALS = 6;
 	
 	private List<Goal> goals;
 	private Random r;
@@ -47,7 +47,7 @@ public class GoalManager {
 	private int dSMs = 0;
 	
 	public GoalManager() {
-		goals = new LinkedList<Goal>();
+		goals = new LinkedList<>();
 		r = new Random(System.currentTimeMillis());
 		init(1);
 	}
@@ -63,7 +63,6 @@ public class GoalManager {
 		
 		goals.clear();
 		
-		//if (level < 3) {
 			switch(level){
 				case 1:
 					goals.add(new Goal(new Vector2D(5*32,32)));
@@ -77,11 +76,6 @@ public class GoalManager {
 					goals.add(new Goal(new Vector2D(9*32,32)));
 					break;
 			}
-			return;
-		//}
-		
-		//for (int i=0; i<MAX_NUM_OF_GOALS; i++)
-		//	goals.add(new Goal(i));		
 	}
 	
 	/**
@@ -97,7 +91,7 @@ public class GoalManager {
 	 * @return - list of goals currently haven't been reached
 	 */
 	public List<Goal> getUnreached() {
-		List<Goal> l = new LinkedList<Goal>();
+		List<Goal> l = new LinkedList<>();
 		for (Goal g : goals)
 			if (!g.isReached)
 				l.add(g);

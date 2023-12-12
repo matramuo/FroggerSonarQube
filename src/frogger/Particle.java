@@ -63,6 +63,7 @@ public class Particle extends MovingEntity {
 		timeExpire = te;
 	}
 	
+	@Override
 	public void update(final long deltaMs) {
 		super.update(deltaMs);
 		

@@ -63,25 +63,25 @@ public class FroggerUI implements ViewableLayer {
 	
 	public void render(RenderingContext rc) {
 		
-		font.render("Time: " + game.levelTimer, rc, 
+		font.render("Time: " + Main.getLevelTimer(), rc, 
 				AffineTransform.getTranslateInstance(180, 7));
 		
-		font.render("Score: " + game.gameScore, rc, 
+		font.render("Score: " + Main.getGameScore(), rc, 
 				AffineTransform.getTranslateInstance(310, 7));
 		
-		if (game.gameLives > 0) {
+		if (Main.getGameLives() > 0) {
 			int dx = 0;
 			
 			// if player has more than 10 lives, draw only 10 hearts
-			int maxHearts = game.gameLives;
+			int maxHearts = Main.getGameLives();
 			if (maxHearts > 10)
 				maxHearts = 10;
 			else 
-				maxHearts = game.gameLives;
+				maxHearts = Main.getGameLives();
 			
 			for (int i = 0; i < maxHearts; i++ ) {
 				heart.get(0).render(rc, 
-						AffineTransform.getTranslateInstance(dx+8, 8));
+						AffineTransform.getTranslateInstance(dx+(double)8, 8));
 				dx = 16 * (i + 1);
 			}
 		}
@@ -118,6 +118,7 @@ public class FroggerUI implements ViewableLayer {
 	}
 
 	public void update(long deltaMs) {
+		// Método heredado vacío.
 	}
 
 	public boolean isActive() {

@@ -28,8 +28,8 @@ import jig.engine.util.Vector2D;
   
 public class ShortLog extends MovingEntity {
 	
-	public static final int length = 32*3;
-	public static final String colSmall = "colSmall";
+	public static final int LENGTH = 32*3;
+	public static final String COLSMALL = "colSmall";
 	
 	public ShortLog (Vector2D pos, Vector2D v) {
 		super(Main.SPRITE_SHEET + "#shortlog");
@@ -37,9 +37,9 @@ public class ShortLog extends MovingEntity {
 		Vector2D posSphere1 = position;
 		Vector2D posSphere2 = new Vector2D(position.getX()+32, position.getY());
 		Vector2D posSphere3 = new Vector2D(position.getX()+64, position.getY());
-		collisionObjects.add(new CollisionObject(colSmall, posSphere1));
-		collisionObjects.add(new CollisionObject(colSmall, posSphere2));
-		collisionObjects.add(new CollisionObject(colSmall, posSphere3));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere1));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere2));
+		collisionObjects.add(new CollisionObject(COLSMALL, posSphere3));
 		velocity = v;
 		if (v.getX() < 0)
 			setFrame(1);

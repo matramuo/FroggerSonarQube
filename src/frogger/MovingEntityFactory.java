@@ -30,15 +30,15 @@ import java.util.Random;
 
 public class MovingEntityFactory {
 	
-	public static int  CAR   = 0;
-	public static int  TRUCK = 1;
-	public static int  SLOG  = 2;
-	public static int  LLOG  = 3;
+	private static int  car   = 0;
+	private static int  truck = 1;
+	private static int  slog  = 2;
+	private static int  llog  = 3;
 	
-	public Vector2D position;
-	public Vector2D velocity;
+	private Vector2D position;
+	private Vector2D velocity;
 	
-	public Random r;
+	private Random r;
 	
 	private long updateMs = 0;
 	private long copCarDelay = 0;
@@ -57,18 +57,18 @@ public class MovingEntityFactory {
 	 * @param rate
 	 */
 	public MovingEntityFactory(Vector2D pos, Vector2D v) {
-		position = pos;
-		velocity = v;
-		r = new Random(System.currentTimeMillis());
+		setPosition(pos);
+		setVelocity(v);
+		setR(new Random(System.currentTimeMillis()));
 
-		creationRate[CAR]   = (int) Math.round(((Car.LENGTH) + padding + 32) / 
-				Math.abs(velocity.getX()));
-		creationRate[TRUCK] = (int) Math.round(((Truck.length) + padding + 32) / 
-				Math.abs(velocity.getX()));
-		creationRate[SLOG]  = (int) Math.round(((ShortLog.length) + padding - 32) / 
-				Math.abs(velocity.getX()));
-		creationRate[LLOG]  = (int) Math.round(((LongLog.length) + padding - 32) / 
-				Math.abs(velocity.getX()));
+		creationRate[getCar()]   = (int) Math.round(((Car.LENGTH) + padding + 32) / 
+				Math.abs(getVelocity().getX()));
+		creationRate[getTruck()] = (int) Math.round(((Truck.LENGTH) + padding + 32) / 
+				Math.abs(getVelocity().getX()));
+		creationRate[getSlog()]  = (int) Math.round(((ShortLog.LENGTH) + padding - 32) / 
+				Math.abs(getVelocity().getX()));
+		creationRate[getLlog()]  = (int) Math.round(((LongLog.LENGTH) + padding - 32) / 
+				Math.abs(getVelocity().getX()));
 	}
 	
 	/**
@@ -82,20 +82,20 @@ public class MovingEntityFactory {
 		if (updateMs > rateMs) {
 			updateMs = 0;
 			
-			if (r.nextInt(100) < chance)			
+			if (getR().nextInt(100) < chance)			
 				switch(type) {
 					case 0: // CAR
-						rateMs = creationRate[CAR];
-						return new Car(position, velocity, r.nextInt(Car.TYPES));
+						rateMs = creationRate[getCar()];
+						return new Car(getPosition(), getVelocity(), getR().nextInt(Car.TYPES));
 					case 1: // TRUCK
-						rateMs = creationRate[TRUCK];
-						return new Truck(position, velocity);
+						rateMs = creationRate[getTruck()];
+						return new Truck(getPosition(), getVelocity());
 					case 2: // SLOG
-						rateMs = creationRate[SLOG];
-						return new ShortLog(position, velocity);
+						rateMs = creationRate[getSlog()];
+						return new ShortLog(getPosition(), getVelocity());
 					case 3: // LLOG
-						rateMs = creationRate[LLOG];
-						return new LongLog(position, velocity);
+						rateMs = creationRate[getLlog()];
+						return new LongLog(getPosition(), getVelocity());
 					default:
 						return null;
 				}
@@ -105,9 +105,9 @@ public class MovingEntityFactory {
 	}
 	
 	public MovingEntity buildShortLogWithTurtles(int chance) {
-		MovingEntity m = buildBasicObject(SLOG,80);
-		if (m != null && r.nextInt(100) < chance)
-			return new Turtles(position, velocity, r.nextInt(2));
+		MovingEntity m = buildBasicObject(getSlog(),80);
+		if (m != null && getR().nextInt(100) < chance)
+			return new Turtles(getPosition(), getVelocity(), getR().nextInt(2));
 		return m;
 	}
 	
@@ -116,9 +116,9 @@ public class MovingEntityFactory {
 	 * @return
 	 */
 	public MovingEntity buildLongLogWithCrocodile(int chance) {
-		MovingEntity m = buildBasicObject(LLOG,80);
-		if (m != null && r.nextInt(100) < chance)
-			return new Crocodile(position, velocity);
+		MovingEntity m = buildBasicObject(getLlog(),80);
+		if (m != null && getR().nextInt(100) < chance)
+			return new Crocodile(getPosition(), getVelocity());
 		return m;
 	}
 
@@ -130,16 +130,16 @@ public class MovingEntityFactory {
 	public MovingEntity buildVehicle() {
 		
 		// Build slightly more cars that trucks
-		MovingEntity m = r.nextInt(100) < 80 ? buildBasicObject(CAR,50) : buildBasicObject(TRUCK,50);
+		MovingEntity m = getR().nextInt(100) < 80 ? buildBasicObject(getCar(),50) : buildBasicObject(getTruck(),50);
 
 		if (m != null) {
 			
 			/* If the road line is clear, that is there are no cars or truck on it
 			 * then send in a high speed cop car
 			 */
-			if (Math.abs(velocity.getX()*copCarDelay) > Main.WORLD_WIDTH) {
+			if (Math.abs(getVelocity().getX()*copCarDelay) > Main.WORLD_WIDTH) {
 				copCarDelay = 0;
-				return new CopCar(position, velocity.scale(5));
+				return new CopCar(getPosition(), getVelocity().scale(5));
 			}
 			copCarDelay = 0;
 		}
@@ -149,5 +149,61 @@ public class MovingEntityFactory {
 	public void update(final long deltaMs) {
 		updateMs += deltaMs;
 		copCarDelay += deltaMs;
+	}
+
+	public static int getCar() {
+		return car;
+	}
+
+	public static void setCar(int car) {
+		MovingEntityFactory.car = car;
+	}
+
+	public static int getTruck() {
+		return truck;
+	}
+
+	public static void setTruck(int truck) {
+		MovingEntityFactory.truck = truck;
+	}
+
+	public static int getSlog() {
+		return slog;
+	}
+
+	public static void setSlog(int slog) {
+		MovingEntityFactory.slog = slog;
+	}
+
+	public static int getLlog() {
+		return llog;
+	}
+
+	public static void setLlog(int llog) {
+		MovingEntityFactory.llog = llog;
+	}
+
+	public Vector2D getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vector2D position) {
+		this.position = position;
+	}
+
+	public Vector2D getVelocity() {
+		return velocity;
+	}
+
+	public void setVelocity(Vector2D velocity) {
+		this.velocity = velocity;
+	}
+
+	public Random getR() {
+		return r;
+	}
+
+	public void setR(Random r) {
+		this.r = r;
 	}
 }

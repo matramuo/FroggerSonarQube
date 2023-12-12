@@ -35,10 +35,10 @@ import jig.engine.util.Vector2D;
  */
 public class Frogger extends MovingEntity {
 	
-	final static int MOVE_STEP = 32;
+	public static final int MOVE_STEP = 32;
 	
 	// Animation related variables 
-	final static private int ANIMATION_STEP = 4; // 32/4 = 8, 8 animation frames, 10 ms each
+	private static final int ANIMATION_STEP = 4; // 32/4 = 8, 8 animation frames, 10 ms each
 	
 	private int curAnimationFrame = 0;
 	private int finalAnimationFrame = 0;
@@ -51,27 +51,25 @@ public class Frogger extends MovingEntity {
 	private MovingEntity followObject = null;
 	
 	
-	public boolean isAlive = false;
+	private boolean isAlive = false;
     private long timeOfDeath = 0;
     
     // Current sprite frame displayed
     private int currentFrame = 0;
     private int tmpFrame = 0;
     
-    public int deltaTime = 0;
+    private int deltaTime = 0;
     
-    public boolean cheating = false;
+    private boolean cheating = false;
     
-    public boolean hw_hasMoved = false;
+    private boolean hwHasMoved = false;
     
-    private Main game;
     
     /**
      * Build frogger!
      */
 	public Frogger (Main g) {
 		super(Main.SPRITE_SHEET + "#frog");
-		game = g;
 		resetFrog();
 		collisionObjects.add(new CollisionObject(position));
 	}
@@ -80,19 +78,19 @@ public class Frogger extends MovingEntity {
 	 * Reset the Frogger to default state and position
 	 */
 	public void resetFrog() {
-		isAlive = true;
-		isAnimating = false;
+		setAlive(true);
+		setAnimating(false);
 		currentFrame = 0;
 		followObject = null;
-		position = Main.FROGGER_START;
-		game.levelTimer = Main.DEFAULT_LEVEL_TIME;
+		position = Main.getFroggerStart();
+		Main.setLevelTimer(Main.DEFAULT_LEVEL_TIME);
 	}
 	
 	/**
 	 * Moving methods, called from Main upon key strokes
 	 */
 	public void moveLeft() {
-		if (getCenterPosition().getX()-16 > 0 && isAlive && !isAnimating) {
+		if (getCenterPosition().getX()-16 > 0 && isAlive() && !isAnimating()) {
 			currentFrame = 3;
 		    move(new Vector2D(-1,0));
 		    AudioEfx.frogJump.play(0.2);
@@ -101,7 +99,7 @@ public class Frogger extends MovingEntity {
 	
 	public void moveRight() {
 		
-		if (getCenterPosition().getX()+32 < Main.WORLD_WIDTH && isAlive && !isAnimating) {
+		if (getCenterPosition().getX()+32 < Main.WORLD_WIDTH && isAlive() && !isAnimating()) {
 			currentFrame = 2;
 		    move(new Vector2D(1,0));
 		    AudioEfx.frogJump.play(0.2);
@@ -109,7 +107,7 @@ public class Frogger extends MovingEntity {
 	}
 	
 	public void moveUp() {
-		if (position.getY() > 32  && isAlive && !isAnimating) {
+		if (position.getY() > 32  && isAlive() && !isAnimating()) {
 			currentFrame = 0;
 		    move(new Vector2D(0,-2));
 		    AudioEfx.frogJump.play(0.2);
@@ -117,7 +115,7 @@ public class Frogger extends MovingEntity {
 	}
 	
 	public void moveDown() {
-		if (position.getY() < Main.WORLD_HEIGHT - MOVE_STEP && isAlive && !isAnimating) {
+		if (position.getY() < Main.WORLD_HEIGHT - MOVE_STEP && isAlive() && !isAnimating()) {
 			currentFrame = 1;
 		    move(new Vector2D(0,1));
 		    AudioEfx.frogJump.play(0.2);
@@ -145,8 +143,8 @@ public class Frogger extends MovingEntity {
 		followObject = null;
 		curAnimationFrame = 0;
 		finalAnimationFrame = MOVE_STEP/ANIMATION_STEP;
-		isAnimating = true;
-		hw_hasMoved = true;
+		setAnimating(true);
+		setHwHasMoved(true);
 		animationBeginTime = getTime();
 		dirAnimation = dir;
 
@@ -165,14 +163,14 @@ public class Frogger extends MovingEntity {
 	 */
 	public void updateAnimation() {
 		// If not animating, sync position of the sprite with its collision sphere
-		if (!isAnimating || !isAlive) {
+		if (!isAnimating() || !isAlive()) {
 			sync(position);
 			return;
 		}
 		
 		// Finish animating
 		if (curAnimationFrame >= finalAnimationFrame) {
-			isAnimating = false;
+			setAnimating(false);
 			currentFrame = tmpFrame;
 			return;
 		}
@@ -185,7 +183,6 @@ public class Frogger extends MovingEntity {
 					position.getY() + dirAnimation.getY()*ANIMATION_STEP
 					);
 			curAnimationFrame++;
-			return;
 		}
 	}
 	
@@ -193,10 +190,10 @@ public class Frogger extends MovingEntity {
 	 * Re-align frog to a grid
 	 */
 	public void allignXPositionToGrid() {
-		if (isAnimating || followObject != null) 
+		if (isAnimating() || followObject != null) 
 			return;
 		double x = position.getX();
-		x = Math.round(x/32)*32;
+		x = Math.round(x/32)*(double)32;
 		position = new Vector2D(x, position.getY());
 		
 	}
@@ -206,7 +203,7 @@ public class Frogger extends MovingEntity {
 	 * @param deltaMs
 	 */
 	public void updateFollow(long deltaMs) {
-		if (followObject == null || !isAlive) 
+		if (followObject == null || !isAlive()) 
 			return;
 		Vector2D dS = followObject.getVelocity().scale(deltaMs);
 		position = new Vector2D(position.getX()+dS.getX(), position.getY()+dS.getY());
@@ -226,8 +223,8 @@ public class Frogger extends MovingEntity {
 	 * @param d
 	 */
 	public void windReposition(Vector2D d) {
-		if (isAlive) {
-			hw_hasMoved = true;
+		if (isAlive()) {
+			setHwHasMoved(true);
 			setPosition(new Vector2D(getPosition().getX()+d.getX(), getPosition().getY()));
 			sync(position);
 		}
@@ -257,33 +254,33 @@ public class Frogger extends MovingEntity {
      * Frogger dies
      */
 	public void die() {
-		if (isAnimating)
+		if (isAnimating())
 			return;
 		
-		if (!cheating) {
+		if (!isCheating()) {
 		    AudioEfx.frogDie.play(0.2);
 		    followObject = null;
-		    isAlive = false;
+		    setAlive(false);
 		    currentFrame = 4;	// dead sprite   
-		    game.gameLives--;
-		    hw_hasMoved = true;
+		    Main.setGameLives(Main.getGameLives() - 1);
+		    setHwHasMoved(true);
 		}
 		
 		timeOfDeath = getTime();
-		game.levelTimer = Main.DEFAULT_LEVEL_TIME;
+		Main.setLevelTimer(Main.DEFAULT_LEVEL_TIME);
 	}
 	
 	/**
 	 * Frogger reaches a goal
 	 */
 	public void reach(final Goal g) {
-		if (g.isReached == false) {
+		if (!g.isReached) {
 			AudioEfx.frogGoal.play(0.4);
-			game.gameScore += 100;
-			game.gameScore += game.levelTimer;
+			Main.setGameScore(Main.getGameScore() + 100);
+			Main.setGameScore(Main.getGameScore() + Main.getLevelTimer());
 			if (g.isBonus) {
 				AudioEfx.bonus.play(0.2);
-				game.gameLives++;
+				Main.setGameLives(Main.getGameLives() + 1);
 			}
 			g.reached();
 			resetFrog();
@@ -293,12 +290,13 @@ public class Frogger extends MovingEntity {
 		}
 	}
 	
+	@Override
 	public void update(final long deltaMs) {
-		if (game.gameLives <= 0)
+		if (Main.getGameLives() <= 0)
 			return;
 		
 		// if dead, stay dead for 2 seconds.
-		if (!isAlive && timeOfDeath + 2000 < System.currentTimeMillis())
+		if (!isAlive() && timeOfDeath + 2000 < System.currentTimeMillis())
 				resetFrog();
 		
 		updateAnimation();	
@@ -306,13 +304,53 @@ public class Frogger extends MovingEntity {
 		setFrame(currentFrame);
 		
 		// Level timer stuff
-		deltaTime += deltaMs;
-		if (deltaTime > 1000) {
-			deltaTime = 0;
-			game.levelTimer--;
+		setDeltaTime(getDeltaTime() + (int)deltaMs);
+		if (getDeltaTime() > 1000) {
+			setDeltaTime(0);
+			Main.setLevelTimer(Main.getLevelTimer() - 1);
 		}
 		
-		if (game.levelTimer <= 0)
+		if (Main.getLevelTimer() <= 0)
 			die();
+	}
+
+	public boolean isAlive() {
+		return isAlive;
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
+	}
+
+	public int getDeltaTime() {
+		return deltaTime;
+	}
+
+	public void setDeltaTime(int deltaTime) {
+		this.deltaTime = deltaTime;
+	}
+
+	public boolean isCheating() {
+		return cheating;
+	}
+
+	public void setCheating(boolean cheating) {
+		this.cheating = cheating;
+	}
+
+	public boolean isHwHasMoved() {
+		return hwHasMoved;
+	}
+
+	public void setHwHasMoved(boolean hwHasMoved) {
+		this.hwHasMoved = hwHasMoved;
+	}
+
+	public boolean isAnimating() {
+		return isAnimating;
+	}
+
+	public void setAnimating(boolean isAnimating) {
+		this.isAnimating = isAnimating;
 	}
 }

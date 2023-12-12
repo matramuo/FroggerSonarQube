@@ -39,7 +39,7 @@ import jig.engine.util.Vector2D;
 public class Main extends StaticScreenGame {
 	static final int WORLD_WIDTH = (13*32);
 	static final int WORLD_HEIGHT = (14*32);
-	static final Vector2D FROGGER_START = new Vector2D(6*32,WORLD_HEIGHT-32);
+	private static final Vector2D FROGGER_START = new Vector2D(6*32,WORLD_HEIGHT-32);
 	
 	static final String RSC_PATH = "resources/";
 	static final String SPRITE_SHEET = RSC_PATH + "frogger_sprites.png";
@@ -82,12 +82,12 @@ public class Main extends StaticScreenGame {
 	protected int gameState = GAME_INTRO;
 	protected int gameLevel = STARTING_LEVEL;
 	
-    public static int gameLives    = FROGGER_LIVES;
-    public static int gameScore    = 0;
+    private static int gameLives    = FROGGER_LIVES;
+    private static int gameScore    = 0;
     
-    public static int levelTimer = DEFAULT_LEVEL_TIME;
+    private static int levelTimer = DEFAULT_LEVEL_TIME;
     
-    private boolean space_has_been_released = false;
+    private boolean spaceHasBeenReleased = false;
 	private boolean keyPressed = false;
 	private boolean listenInput = true;
 	
@@ -184,48 +184,66 @@ public class Main extends StaticScreenGame {
 	 * @param deltaMs
 	 */
 	public void cycleTraffic(long deltaMs) {
-		MovingEntity m;
-		/* Road traffic updates */
-		roadLine1.update(deltaMs);
-	    if ((m = roadLine1.buildVehicle()) != null) movingObjectsLayer.add(m);
+		roadTrafficUpdates(deltaMs);
 		
-		roadLine2.update(deltaMs);
-	    if ((m = roadLine2.buildVehicle()) != null) movingObjectsLayer.add(m);
-	    
-		roadLine3.update(deltaMs);
-	    if ((m = roadLine3.buildVehicle()) != null) movingObjectsLayer.add(m);
-	    
-		roadLine4.update(deltaMs);
-	    if ((m = roadLine4.buildVehicle()) != null) movingObjectsLayer.add(m);
-
-		roadLine5.update(deltaMs);
-	    if ((m = roadLine5.buildVehicle()) != null) movingObjectsLayer.add(m);
-	    
-		
-		/* River traffic updates */
-		riverLine1.update(deltaMs);
-	    if ((m = riverLine1.buildShortLogWithTurtles(40)) != null) movingObjectsLayer.add(m);
-		
-		riverLine2.update(deltaMs);
-	    if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null) movingObjectsLayer.add(m);
-		
-		riverLine3.update(deltaMs);
-	    if ((m = riverLine3.buildShortLogWithTurtles(50)) != null) movingObjectsLayer.add(m);
-		
-		riverLine4.update(deltaMs);
-	    if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null) movingObjectsLayer.add(m);
-
-		riverLine5.update(deltaMs);
-	    if ((m = riverLine5.buildShortLogWithTurtles(10)) != null) movingObjectsLayer.add(m);
+		riverTrafficUpdates(deltaMs);
 	    
 	    // Do Wind
-	    if ((m = wind.genParticles(gameLevel)) != null) particleLayer.add(m);
+		MovingEntity mWind = wind.genParticles(gameLevel);
+	    if (mWind != null) particleLayer.add(mWind);
 	    
 	    // HeatWave
-	    if ((m = hwave.genParticles(frog.getCenterPosition())) != null) particleLayer.add(m);
+	    MovingEntity mWave = hwave.genParticles(frog.getCenterPosition());
+	    if (mWave != null) particleLayer.add(mWave);
 	        
 	    movingObjectsLayer.update(deltaMs);
 	    particleLayer.update(deltaMs);
+	}
+	
+	private void roadTrafficUpdates(long deltaMs) {
+		/* Road traffic updates */
+		roadLine1.update(deltaMs);
+		MovingEntity mRoadLine1 = roadLine1.buildVehicle();
+	    if (mRoadLine1 != null) movingObjectsLayer.add(mRoadLine1);
+		
+		roadLine2.update(deltaMs);
+		MovingEntity mRoadLine2 = roadLine2.buildVehicle();
+	    if (mRoadLine2 != null) movingObjectsLayer.add(mRoadLine2);
+	    
+		roadLine3.update(deltaMs);
+		MovingEntity mRoadLine3 = roadLine3.buildVehicle();
+	    if (mRoadLine3 != null) movingObjectsLayer.add(mRoadLine3);
+	    
+		roadLine4.update(deltaMs);
+		MovingEntity mRoadLine4 = roadLine4.buildVehicle();
+	    if (mRoadLine4 != null) movingObjectsLayer.add(mRoadLine4);
+
+		roadLine5.update(deltaMs);
+		MovingEntity mRoadLine5 = roadLine5.buildVehicle();
+	    if (mRoadLine5 != null) movingObjectsLayer.add(mRoadLine5);
+	}
+	
+	private void riverTrafficUpdates(long deltaMs) {
+		/* River traffic updates */
+		riverLine1.update(deltaMs);
+		MovingEntity mRiverLine1 = riverLine1.buildShortLogWithTurtles(40);
+	    if (mRiverLine1 != null) movingObjectsLayer.add(mRiverLine1);
+		
+		riverLine2.update(deltaMs);
+		MovingEntity mRiverLine2 = riverLine2.buildLongLogWithCrocodile(30);
+	    if (mRiverLine2 != null) movingObjectsLayer.add(mRiverLine2);
+		
+		riverLine3.update(deltaMs);
+		MovingEntity mRiverLine3 = riverLine3.buildShortLogWithTurtles(50);
+	    if (mRiverLine3 != null) movingObjectsLayer.add(mRiverLine3);
+		
+		riverLine4.update(deltaMs);
+		MovingEntity mRiverLine4 = riverLine4.buildLongLogWithCrocodile(20);
+	    if (mRiverLine4 != null) movingObjectsLayer.add(mRiverLine4);
+
+		riverLine5.update(deltaMs);
+		MovingEntity mRiverLine5 = riverLine5.buildShortLogWithTurtles(10);
+	    if (mRiverLine5 != null) movingObjectsLayer.add(mRiverLine5);
 	}
 	
 	/**
@@ -240,36 +258,39 @@ public class Main extends StaticScreenGame {
 		boolean leftPressed = keyboard.isPressed(KeyEvent.VK_LEFT);
 		boolean rightPressed = keyboard.isPressed(KeyEvent.VK_RIGHT);
 		
+		enableDisableCheating();
+		
+		keyStrokesCheck(keyReleased, downPressed, upPressed, leftPressed, rightPressed);
+		
+	}
+	
+	private void enableDisableCheating() {
 		// Enable/Disable cheating
-		if (keyboard.isPressed(KeyEvent.VK_C))
-			frog.cheating = true;
-		if (keyboard.isPressed(KeyEvent.VK_V))
-			frog.cheating = false;
-		if (keyboard.isPressed(KeyEvent.VK_0)) {
-			gameLevel = 10;
-			initializeLevel(gameLevel);
-		}
-		
-		
+				if (keyboard.isPressed(KeyEvent.VK_C))
+					frog.setCheating(true);
+				if (keyboard.isPressed(KeyEvent.VK_V))
+					frog.setCheating(false);
+				if (keyboard.isPressed(KeyEvent.VK_0)) {
+					gameLevel = 10;
+					initializeLevel(gameLevel);
+				}
+	}
+	
+	private void keyStrokesCheck(boolean keyReleased, boolean downPressed, boolean upPressed,
+			boolean leftPressed, boolean rightPressed) {
 		/*
 		 * This logic checks for key strokes.
 		 * It registers a key press, and ignores all other key strokes
 		 * until the first key has been released
 		 */
+		
 		if (downPressed || upPressed || leftPressed || rightPressed)
 			keyPressed = true;
 		else if (keyPressed)
 			keyReleased = true;
 		
-		if (listenInput) {
-		    if (downPressed) frog.moveDown();
-		    if (upPressed) frog.moveUp();
-		    if (leftPressed) frog.moveLeft();
-	 	    if (rightPressed) frog.moveRight();
-	 	    
-	 	    if (keyPressed)
-	            listenInput = false;
-		}
+		
+		listenInputMethod(downPressed, upPressed, leftPressed, rightPressed);
 		
 		if (keyReleased) {
 			listenInput = true;
@@ -280,6 +301,28 @@ public class Main extends StaticScreenGame {
 			gameState = GAME_INTRO;
 	}
 	
+	private void listenInputMethod(boolean downPressed, boolean upPressed,
+			boolean leftPressed, boolean rightPressed) {
+		if (listenInput) {
+		    if (downPressed) {
+		    	frog.moveDown();
+		    }
+		    if (upPressed) {
+		    	frog.moveUp();
+		    }
+		    if (leftPressed) {
+		    	frog.moveLeft();
+		    }
+	 	    if (rightPressed) {
+	 	    	frog.moveRight();
+	 	    }
+	 	    
+	 	    if (keyPressed) {
+	 	    	listenInput = false;
+	 	    }
+		}
+	}
+	
 	/**
 	 * Handle keyboard events while at the game intro menu
 	 */
@@ -288,10 +331,10 @@ public class Main extends StaticScreenGame {
 		
 		// Following 2 if statements allow capture space bar key strokes
 		if (!keyboard.isPressed(KeyEvent.VK_SPACE)) {
-			space_has_been_released = true;
+			spaceHasBeenReleased = true;
 		}
 		
-		if (!space_has_been_released)
+		if (!spaceHasBeenReleased)
 			return;
 		
 		if (keyboard.isPressed(KeyEvent.VK_SPACE)) {
@@ -299,14 +342,14 @@ public class Main extends StaticScreenGame {
 			case GAME_INSTRUCTIONS:
 			case GAME_OVER:
 				gameState = GAME_INTRO;
-				space_has_been_released = false;
+				spaceHasBeenReleased = false;
 				break;
 			default:
-				gameLives = FROGGER_LIVES;
-				gameScore = 0;
+				setGameLives(FROGGER_LIVES);
+				setGameScore(0);
 				gameLevel = STARTING_LEVEL;
-				levelTimer = DEFAULT_LEVEL_TIME;
-				frog.setPosition(FROGGER_START);
+				setLevelTimer(DEFAULT_LEVEL_TIME);
+				frog.setPosition(getFroggerStart());
 				gameState = GAME_PLAY;
 				audiofx.playGameMusic();
 				initializeLevel(gameLevel);			
@@ -334,6 +377,7 @@ public class Main extends StaticScreenGame {
 	 */
 	public void update(long deltaMs) {
 		switch(gameState) {
+		default:
 		case GAME_PLAY:
 			froggerKeyboardHandler();
 			wind.update(deltaMs);
@@ -356,18 +400,18 @@ public class Main extends StaticScreenGame {
 			hwave.perform(frog, gameLevel);
 			
 	
-			if (!frog.isAlive)
+			if (!frog.isAlive())
 				particleLayer.clear();
 			
 			goalmanager.update(deltaMs);
 			
-			if (goalmanager.getUnreached().size() == 0) {
+			if (goalmanager.getUnreached().isEmpty()) {
 				gameState = GAME_FINISH_LEVEL;
 				audiofx.playCompleteLevel();
 				particleLayer.clear();
 			}
 			
-			if (gameLives < 1) {
+			if (getGameLives() < 1) {
 				gameState = GAME_OVER;
 			}
 			
@@ -393,13 +437,13 @@ public class Main extends StaticScreenGame {
 	 */
 	public void render(RenderingContext rc) {
 		switch(gameState) {
+		default:
 		case GAME_FINISH_LEVEL:
 		case GAME_PLAY:
 			backgroundLayer.render(rc);
 			
-			if (frog.isAlive) {
+			if (frog.isAlive()) {
 				movingObjectsLayer.render(rc);
-				//frog.collisionObjects.get(0).render(rc);
 				frog.render(rc);		
 			} else {
 				frog.render(rc);
@@ -423,5 +467,40 @@ public class Main extends StaticScreenGame {
 	public static void main (String[] args) {
 		Main f = new Main();
 		f.run();
+	}
+
+
+	public static int getGameLives() {
+		return gameLives;
+	}
+
+
+	public static void setGameLives(int gameLives) {
+		Main.gameLives = gameLives;
+	}
+
+
+	public static int getGameScore() {
+		return gameScore;
+	}
+
+
+	public static void setGameScore(int gameScore) {
+		Main.gameScore = gameScore;
+	}
+
+
+	public static int getLevelTimer() {
+		return levelTimer;
+	}
+
+
+	public static void setLevelTimer(int levelTimer) {
+		Main.levelTimer = levelTimer;
+	}
+
+
+	public static Vector2D getFroggerStart() {
+		return FROGGER_START;
 	}
 }

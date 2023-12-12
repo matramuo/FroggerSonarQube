@@ -53,17 +53,17 @@ public class HeatWave {
 	 * @param f - reference Frogger's hw_hasMoved
 	 */
 	public void perform (Frogger f, final int level) {	
-		if (!f.isAlive) {
+		if (!f.isAlive()) {
 			isHot = false;
 			return;
 		}
 		
-		if (isHot && durationMs > (DURATION - (level*10)) && !f.hw_hasMoved) {
+		if (isHot && durationMs > (DURATION - (level*10)) && !f.isHwHasMoved()) {
 			f.randomJump(r.nextInt(4));
 			isHot = false;
 		}
 		
-		if (f.hw_hasMoved)
+		if (f.isHwHasMoved())
 			isHot = false;
 	}
 	
@@ -79,7 +79,7 @@ public class HeatWave {
 			if (r.nextInt(100) < GameLevel*10) {
 				durationMs = 1;
 				isHot = true;
-				f.hw_hasMoved = false;
+				f.setHwHasMoved(false);
 				AudioEfx.heat.play(0.2);
 			}		
 			timeMs = 0;
